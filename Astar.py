@@ -1,4 +1,24 @@
-# Grafo con costos reales (distancias)
+import math
+
+def distancebystart (latStart, lonStart, latDest,lonDest):
+    r = 6371.0
+
+    latStart = math.radians(latStart) 
+    lonStart = math.radians(lonStart) 
+    latDest = math.radians(latDest) 
+    lonDest = math.radians(lonDest) 
+
+    dlat= latDest-latStart
+    dlon= lonDest-lonStart
+
+    a=math.sin(dlat/2)**2 + math.cos(latStart)*math.cos(latDest)*math.sin(dlon/2)**2
+    c= 2* math.asin(math.sqrt(a))
+
+    distance= r*c
+
+    return distance
+
+# Grafo con ciudades
 ciudades = {
     'Bogota': {'latitud': 4.7110, 'longitud': -74.0721},
     'Medellin': {'latitud': 6.2442, 'longitud': -75.5812},
@@ -22,15 +42,65 @@ ciudades = {
     'Riohacha': {'latitud': 11.5444, 'longitud': -72.9072}
 }
 
-# Heurística h(n): distancia en línea recta a Bucarest
-h = {
-    'Arad': 366, 'Bucarest': 0, 'Craiova': 160, 'Dobreta': 242,
-    'Eforie': 161, 'Fagaras': 176, 'Giurgiu': 77, 'Hirsova': 151,
-    'Iasi': 226, 'Lugoj': 244, 'Mehadia': 241, 'Neamt': 234,
-    'Oradea': 380, 'Pitesti': 100, 'Rimnicu Vilcea': 193,
-    'Sibiu': 253, 'Timisoara': 329, 'Urziceni': 80,
-    'Vaslui': 199, 'Zerind': 374
+#grafo con rutas
+grafo = {
+    'Bogota': {"Ibague", "Villavicencio", "Tunja", "Bucaramanga"},
+    
+    "Ibague": {"Bogota", "Armenia", "Neiva"},
+    
+    "Armenia": {"Ibague", "Pereira", "Cali"},
+    
+    "Pereira": {"Armenia", "Manizales"},
+    
+    "Manizales": {"Pereira", "Medellin"},
+    
+    "Medellin": {"Manizales", "Monteria"},
+    
+    "Cali": {"Popayan", "Armenia"},
+    
+    "Popayan": {"Cali", "Pasto"},
+    
+    "Pasto": {"Popayan"},
+    
+    "Neiva": {"Ibague"},
+    
+    "Villavicencio": {"Bogota"},
+    
+    "Tunja": {"Bogota", "Bucaramanga"},
+    
+    "Bucaramanga": {"Bogota", "Cucuta", "Tunja"},
+    
+    "Cucuta": {"Bucaramanga"},
+    
+    "Barranquilla": {"Cartagena", "Santa Marta", "Sincelejo"},
+    
+    "Cartagena": {"Barranquilla", "Sincelejo", "Monteria"},
+    
+    "Santa Marta": {"Barranquilla", "Riohacha"},
+    
+    "Riohacha": {"Santa Marta"},
+    
+    "Sincelejo": {"Monteria", "Cartagena", "Barranquilla"},
+    
+    "Monteria": {"Sincelejo", "Cartagena", "Medellin"}
 }
+
+# Heurística h(n): distancia en línea desde un punto hasta el destino+
+def crear_heuristica(ciudades_dict, ciudad_destino):
+    """Calcula la distancia de cada ciudad al destino"""
+    h = {}
+    lat_dest = ciudades_dict[ciudad_destino]['latitud']
+    lon_dest = ciudades_dict[ciudad_destino]['longitud']
+    
+    for ciudad, coords in ciudades_dict.items():
+        h[ciudad] = distancebystart(
+            coords['latitud'], 
+            coords['longitud'], 
+            lat_dest, 
+            lon_dest
+        )
+    
+    return h
 
 def a_star(start, goal):
     open_set = {start}
@@ -66,3 +136,4 @@ def a_star(start, goal):
 camino, costo = a_star("Arad", "Bucarest")
 print("Camino:", camino)
 print("Costo:", costo)
+
