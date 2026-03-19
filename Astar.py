@@ -99,39 +99,40 @@ def crear_heuristica(ciudades_dict, ciudad_destino):
     return h
 
 
-#-
-# def a_star(start, goal):
-#     open_set = {start}
-#     came_from = {}
-#     g = {city: float('inf') for city in graph}
-#     g[start] = 0
-#     f = {city: float('inf') for city in graph}
-#     f[start] = h[start]
 
-#     while open_set:
-#         # nodo con menor f
-#         current = min(open_set, key=lambda x: f[x])
-#         if current == goal:
-#             # reconstruir camino
-#             path = []
-#             while current in came_from:
-#                 path.append(current)
-#                 current = came_from[current]
-#             path.append(start)
-#             return path[::-1], g[goal]
+def a_star(start, goal):
+    h = crear_heuristica(start,goal)
+    open_set = {start}
+    came_from = {}
+    g = {city: float('inf') for city in conexiones}
+    g[start] = 0
+    f = {city: float('inf') for city in conexiones}
+    f[start] = h[start]
 
-#         open_set.remove(current)
-#         for neighbor, cost in graph[current].items():
-#             tentative_g = g[current] + cost
-#             if tentative_g < g[neighbor]:
-#                 came_from[neighbor] = current
-#                 g[neighbor] = tentative_g
-#                 f[neighbor] = tentative_g + h[neighbor]
-#                 open_set.add(neighbor)
+    while open_set:
+        # nodo con menor f
+        current = min(open_set, key=lambda x: f[x])
+        if current == goal:
+            # reconstruir camino
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            return path[::-1], g[goal]
 
-#     return None, float('inf')
+        open_set.remove(current)
+        for neighbor, cost in conexiones[current].items():
+            tentative_g = g[current] + cost
+            if tentative_g < g[neighbor]:
+                came_from[neighbor] = current
+                g[neighbor] = tentative_g
+                f[neighbor] = tentative_g + h[neighbor]
+                open_set.add(neighbor)
 
-# camino, costo = a_star("Arad", "Bucarest")
-# print("Camino:", camino)
-# print("Costo:", costo)
+    return None, float('inf')
+
+camino, costo = a_star("Bogota", "Cali")
+print("Camino:", camino)
+print("Costo:", costo)
 
