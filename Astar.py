@@ -1,22 +1,5 @@
 import math
-
-def distancebystart (latStart, lonStart, latDest,lonDest):
-    r = 6371.0
-
-    latStart = math.radians(latStart) 
-    lonStart = math.radians(lonStart) 
-    latDest = math.radians(latDest) 
-    lonDest = math.radians(lonDest) 
-
-    dlat= latDest-latStart
-    dlon= lonDest-lonStart
-
-    a=math.sin(dlat/2)**2 + math.cos(latStart)*math.cos(latDest)*math.sin(dlon/2)**2
-    c= 2* math.asin(math.sqrt(a))
-
-    distance= r*c
-
-    return distance
+import pprint
 
 # Grafo con ciudades
 ciudades = {
@@ -43,47 +26,60 @@ ciudades = {
 }
 
 #grafo con rutas
-grafo = {
-    'Bogota': {"Ibague", "Villavicencio", "Tunja", "Bucaramanga"},
-    
-    "Ibague": {"Bogota", "Armenia", "Neiva"},
-    
-    "Armenia": {"Ibague", "Pereira", "Cali"},
-    
-    "Pereira": {"Armenia", "Manizales"},
-    
-    "Manizales": {"Pereira", "Medellin"},
-    
-    "Medellin": {"Manizales", "Monteria"},
-    
-    "Cali": {"Popayan", "Armenia"},
-    
-    "Popayan": {"Cali", "Pasto"},
-    
-    "Pasto": {"Popayan"},
-    
-    "Neiva": {"Ibague"},
-    
-    "Villavicencio": {"Bogota"},
-    
-    "Tunja": {"Bogota", "Bucaramanga"},
-    
-    "Bucaramanga": {"Bogota", "Cucuta", "Tunja"},
-    
-    "Cucuta": {"Bucaramanga"},
-    
-    "Barranquilla": {"Cartagena", "Santa Marta", "Sincelejo"},
-    
-    "Cartagena": {"Barranquilla", "Sincelejo", "Monteria"},
-    
-    "Santa Marta": {"Barranquilla", "Riohacha"},
-    
-    "Riohacha": {"Santa Marta"},
-    
-    "Sincelejo": {"Monteria", "Cartagena", "Barranquilla"},
-    
-    "Monteria": {"Sincelejo", "Cartagena", "Medellin"}
-}
+conexiones = {
+    'Armenia': {'Cali': 152.9434, 'Ibague': 50.8713, 'Pereira': 31.2149},
+    'Barranquilla': {'Cartagena': 99.7108, 'Santa Marta': 70.3822, 'Sincelejo': 196.9281},
+    'Bogota': {'Bucaramanga': 287.6396, 'Ibague': 132.0978, 'Tunja': 120.3551, 'Villavicencio': 80.2645},
+    'Bucaramanga': {'Bogota': 287.6396, 'Cucuta': 109.9525, 'Tunja': 178.2034},
+    'Cali': {'Armenia': 152.9434, 'Popayan': 112.3271},
+    'Cartagena': {'Barranquilla': 99.7108, 'Monteria': 187.9459, 'Sincelejo': 121.1214},
+    'Cucuta': {'Bucaramanga': 109.9525},
+    'Ibague': {'Armenia': 50.8713, 'Bogota': 132.0978, 'Neiva': 168.1727},
+    'Manizales': {'Medellin': 130.7446, 'Pereira': 34.8063},
+    'Medellin': {'Manizales': 130.7446, 'Monteria': 280.3587},
+    'Monteria': {'Cartagena': 187.9459, 'Medellin': 280.3587, 'Sincelejo': 81.5702},
+    'Neiva': {'Ibague': 168.1727},
+    'Pasto': {'Popayan': 155.652},
+    'Pereira': {'Armenia': 31.2149, 'Manizales': 34.8063},
+    'Popayan': {'Cali': 112.3271, 'Pasto': 155.652},
+    'Riohacha': {'Santa Marta': 144.8013},
+    'Santa Marta': {'Barranquilla': 70.3822, 'Riohacha': 144.8013},
+    'Sincelejo': {'Barranquilla': 196.9281, 'Cartagena': 121.1214, 'Monteria': 81.5702},
+    'Tunja': {'Bogota': 120.3551, 'Bucaramanga': 178.2034},
+    'Villavicencio': {'Bogota': 80.2645}}
+
+def distancebystart (latStart, lonStart, latDest,lonDest):
+    r = 6371.0
+
+    latStart = math.radians(latStart) 
+    lonStart = math.radians(lonStart) 
+    latDest = math.radians(latDest) 
+    lonDest = math.radians(lonDest) 
+
+    dlat= latDest-latStart
+    dlon= lonDest-lonStart
+
+    a=math.sin(dlat/2)**2 + math.cos(latStart)*math.cos(latDest)*math.sin(dlon/2)**2
+    c= 2* math.asin(math.sqrt(a))
+
+    distance= r*c
+
+    return distance
+
+#Codigo utilizado para hallar la distancia entre conexiones
+# grafo = {}
+# for ciudad, vecinos in conexiones.items():
+#     grafo[ciudad] = {}
+#     for vecino in vecinos:
+#         dist = distancebystart(
+#             ciudades[ciudad]["latitud"], ciudades[ciudad]["longitud"],
+#             ciudades[vecino]["latitud"], ciudades[vecino]["longitud"],
+#         )
+#         grafo[ciudad][vecino] = round(dist, 4)
+
+# print("grafo = ")
+# pprint.pprint(grafo, sort_dicts=True)
+
 
 # Heurística h(n): distancia en línea desde un punto hasta el destino+
 def crear_heuristica(ciudades_dict, ciudad_destino):
@@ -102,38 +98,40 @@ def crear_heuristica(ciudades_dict, ciudad_destino):
     
     return h
 
-def a_star(start, goal):
-    open_set = {start}
-    came_from = {}
-    g = {city: float('inf') for city in graph}
-    g[start] = 0
-    f = {city: float('inf') for city in graph}
-    f[start] = h[start]
 
-    while open_set:
-        # nodo con menor f
-        current = min(open_set, key=lambda x: f[x])
-        if current == goal:
-            # reconstruir camino
-            path = []
-            while current in came_from:
-                path.append(current)
-                current = came_from[current]
-            path.append(start)
-            return path[::-1], g[goal]
+#-
+# def a_star(start, goal):
+#     open_set = {start}
+#     came_from = {}
+#     g = {city: float('inf') for city in graph}
+#     g[start] = 0
+#     f = {city: float('inf') for city in graph}
+#     f[start] = h[start]
 
-        open_set.remove(current)
-        for neighbor, cost in graph[current].items():
-            tentative_g = g[current] + cost
-            if tentative_g < g[neighbor]:
-                came_from[neighbor] = current
-                g[neighbor] = tentative_g
-                f[neighbor] = tentative_g + h[neighbor]
-                open_set.add(neighbor)
+#     while open_set:
+#         # nodo con menor f
+#         current = min(open_set, key=lambda x: f[x])
+#         if current == goal:
+#             # reconstruir camino
+#             path = []
+#             while current in came_from:
+#                 path.append(current)
+#                 current = came_from[current]
+#             path.append(start)
+#             return path[::-1], g[goal]
 
-    return None, float('inf')
+#         open_set.remove(current)
+#         for neighbor, cost in graph[current].items():
+#             tentative_g = g[current] + cost
+#             if tentative_g < g[neighbor]:
+#                 came_from[neighbor] = current
+#                 g[neighbor] = tentative_g
+#                 f[neighbor] = tentative_g + h[neighbor]
+#                 open_set.add(neighbor)
 
-camino, costo = a_star("Arad", "Bucarest")
-print("Camino:", camino)
-print("Costo:", costo)
+#     return None, float('inf')
+
+# camino, costo = a_star("Arad", "Bucarest")
+# print("Camino:", camino)
+# print("Costo:", costo)
 
