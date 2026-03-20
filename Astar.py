@@ -101,7 +101,7 @@ def crear_heuristica(ciudades_dict, ciudad_destino):
 
 
 def a_star(start, goal):
-    h = crear_heuristica(start,goal)
+    h = crear_heuristica(ciudades, goal)
     open_set = {start}
     came_from = {}
     g = {city: float('inf') for city in conexiones}
@@ -132,7 +132,6 @@ def a_star(start, goal):
 
     return None, float('inf')
 
-camino, costo = a_star("Bogota", "Cali")
+camino, costo = a_star("Pasto", "Barranquilla")
 print("Camino:", camino)
 print("Costo:", costo)
-
